@@ -3,6 +3,7 @@ const path = require('path');
 const app = express();
 
 const homeRoutes = require('./app/routes/homeRoutes');
+const apiRoutes = require('./app/routes/apiRoutes');
 
 const { initializeTables } = require('./app/lib/Database');
 
@@ -15,6 +16,7 @@ app.use(express.json());  // automatically parse json request body into object
 
 // routers
 app.use('/', homeRoutes);
+app.use('/api', apiRoutes);
 
 // database init
 const databaseInitialized = initializeTables();
