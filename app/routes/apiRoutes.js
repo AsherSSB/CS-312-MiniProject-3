@@ -1,45 +1,44 @@
 const express = require('express');
 const router = express.Router();
-const BlogPost = require('../lib/BlogPost');
+const { postBlog, deleteBlog, editBlogBody } = require('../lib/Database');
 
-let blogs = []
-
-router.post('/blog', (req, res) => {
+router.post('/blog', async (req, res) => {
     const payload = req.body;
     if (!payload) {
         return res.status(400).json({message: "blog posted unsuccessfully"});
 	}
 
-	let newBlog = new BlogPost(
-		blogs.length, 
-		payload.author, 
-		payload.title, 
-		payload.content, 
-		payload.category
-	); 
+    const author = payload.author
+	const title = payload.title
+	const body = payload.content
+	const category = payload.category
 
-	blogs.push(newBlog);
+    // TODO: replace 0 with user id when JWT implement
+    const successfullyPosted = postBlog(author, 0, title, category, body)
+
+    if (!successfullyPosted) {
+	    return res.status(400).json({message: "bad request posting blog"});
+    }
+
 	return res.status(201).json({message: "blog recieved successfully"});
 });
 
-router.delete('/blog/:id', (req, res) => {
+router.delete('/blog/:id', async (req, res) => {
     const blogId = parseInt(req.params.id);
     if (isNaN(blogId)) {
         return res.status(400).json({message: 'Invalid blog ID'});
 	}
 
-	const blogIndex = blogs.findIndex(blog => blog.id === blogId);
+    const result = await deleteBlog(blogId);
+    
+    if (result) {
+        return res.status(200).json({message: `Blog ${blogId} successfully deleted`});
+    }
 
-	if (blogIndex !== -1){
-		blogs.splice(blogIndex, 1); 
-		return res.status(200).json({message: `Blog ${blogId} successfully deleted`});
-
-	} else {
-		return res.status(404).json({message: 'Blog not found'});
-	}
+    return res.status(400).json({message: 'Bad Request'});
 });
 
-router.patch('/blog/:id', (req, res) => {
+router.patch('/blog/:id', async (req, res) => {
 	const blogId = parseInt(req.params.id);
 	const payload = req.body;
 
@@ -51,21 +50,13 @@ router.patch('/blog/:id', (req, res) => {
 		return res.status(400).json({message: 'Invalid payload'});
 	}
 
-	const blogIndex = blogs.findIndex(blog => blog.id === blogId);
+    const result = await editBlogBody(blogId, payload.content);
 
-	if (blogIndex === -1) {
+	if (!result) {
 		return res.status(404).json({message: 'Blog not found'});
 	}
 
-	const targetBlog = blogs[blogIndex];
-	const propertiesChanged = [];
-	for	(key in payload){
-		if (key in targetBlog) {
-			targetBlog[key] = payload[key]
-			propertiesChanged.push(key)
-		}
-	}
-	return res.status(200).json({message: `Blog ${propertiesChanged.join(", ")} changed`});
+	return res.status(200).json({message: `Blog successfully changed`});
 });
 
 module.exports = router;

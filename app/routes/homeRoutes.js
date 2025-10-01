@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const { getAllBlogs } = require('../lib/Database');
 
-let blogs = []
-
-router.get('/', (req, res) => {
-    return res.render('home/index.ejs', {blogs: blogs});
+router.get('/', async (req, res) => {
+    const blogs = await getAllBlogs();
+    return res.render('home/index.ejs', {blogs: blogs} );
 });
 
 module.exports = router;
