@@ -11,35 +11,45 @@
         
         <header class="fixed-top">
             <h1 class="d-flex justify-content-between align-items-center my-3 mx-5">
-              <a href="/" class="text-reset text-decoration-none"><span class="ml-5">Blog.site</span></a>
+                <a href="/" class="text-reset text-decoration-none"><span class="ml-5">Blog.site</span></a>
             </h1>
         </header>
 
         <main>
-            <div class="d-flex justify-content-center">
+            <form id="signup-form">
+                <div class="d-flex justify-content-center">
+                    <div class="card my-5 w-50">
 
-                <div class="card my-5">
-                    <div class="card-header">Signup for Blog.site</div>
-                    <div class="card-body">
+                        <div class="card-header">Sign up for Blog.site</div>
 
-                        <form>
+                        <div class="card-body">
 
-                            <div class="form-group">
-                                <label for="username-input">Username:</label>
-                                <input class="form-control" type="text" id="username-input" name="username">
+                            <div>
+                                <label for="username-input"></label>
+                                <input class="form-control" placeholder="username" type="text" id="username-input" name="username">
+                                <div class="invalid-feedback">Username must be 3 or more letters and contain no special characters</div>
                             </div>
 
-                            <div class="form-group">
-                                <label for="password-input">Password:</label>
-                                <input class="form-control" type="text" id="password-input" name="password">
+                            <div>
+                                <label for="password-input"></label>
+                                <input class="form-control" placeholder="password" type="password" id="password-input" name="password">
+                                <div class="invalid-feedback">Password must contain 8 characters, at least 1 uppercase, lowercase, and special character</div>
                             </div>
 
-                        </form>
+                            <div>
+                                <label for="password-confirm"></label>
+                                <input class="form-control" placeholder="retype password" type="password" id="password-confirm" name="password-confirm">
+                            </div>
+
+                        </div>
+
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
 
                     </div>
-                    <div class="card-footer">Footer</div>
                 </div>
-            </div>
+            </form>
         </main>
 
         <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
