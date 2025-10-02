@@ -4,13 +4,13 @@ const passwordInput = document.querySelector('#password-input');
 const passwordConfirm = document.querySelector('#password-confirm');
 
 signupForm.addEventListener('submit', (event) => {
-    console.log('submitting');
+    console.debug('submitting');
     event.preventDefault();
     processSignup();
 })
 
 async function processSignup() {
-    console.log('processing');
+    console.debug('processing');
     const signupInfoIsValid = validateSignupInfo();
     
     if (!signupInfoIsValid) {
@@ -18,7 +18,7 @@ async function processSignup() {
         return false;
     }
 
-    console.log('POSTING');
+    console.debug('POSTING');
     const signupSuccessful = await postSignup();
 
     if (!signupSuccessful) {
@@ -28,6 +28,7 @@ async function processSignup() {
 
     // signed up 
     // TODO: redirect to login
+    console.debug('goin home');
     redirectHome();
 }
 
@@ -36,9 +37,10 @@ function redirectHome() {
 }
 
 async function postSignup() {
-    console.log("sending signup");
+    console.debug("sending signup");
     const formData = new FormData(signupForm);
     const dataObject = Object.fromEntries(formData);
+    delete dataObject['password-confirm'];
     const jsonData = JSON.stringify(dataObject);
     return fetch('/api/signup', {
         method: 'POST',
@@ -63,24 +65,24 @@ async function postSignup() {
 }
 
 function validateSignupInfo() {
-    console.log('VALIDATING');
+    console.debug('VALIDATING');
     const passwordsDontMatch = passwordInput.value != passwordConfirm.value;
     const invalidPassword = !validatePassword(passwordInput.value);
     const invalidUsername = !validateUsername(usernameInput.value)
 
     if (passwordsDontMatch) {
         passwordConfirm.classList.add('is-invalid');
-        console.log('NO MATCH: ', passwordInput.value, passwordConfirm.value);
+        console.debug('NO MATCH: ', passwordInput.value, passwordConfirm.value);
     }
     
     if (invalidPassword) {
         passwordInput.classList.add('is-invalid');
-        console.log('INVALID PASS: ', passwordInput.value);
+        console.debug('INVALID PASS: ', passwordInput.value);
     }
 
     if (invalidUsername) {
         usernameInput.classList.add('is-invalid');
-        console.log('INVALID NAME: ', usernameInput.value);
+        console.debug('INVALID NAME: ', usernameInput.value);
     }
 
     return !(passwordsDontMatch ||

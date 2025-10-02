@@ -122,10 +122,30 @@ async function editBlogBody(blogId, newBody) {
     return result;
 }
 
+async function checkUsernameExists(username) {
+    return await pool.query(`
+            SELECT EXISTS FROM (
+                SELECT 1
+                FROM users
+                WHERE username = $1
+            );
+        `, [username])
+        .then(res => {
+            return res.rows[0].exists;
+        })
+        .catch(err => {
+            console.error('Error while checking user exists', err);
+            return false;
+        });
+}
+
+async function addUser(
+
 module.exports = {
     initializeTables,
     getAllBlogs,
     postBlog,
     deleteBlog,
-    editBlogBody
+    editBlogBody,
+    checkUsernameExists
 }
