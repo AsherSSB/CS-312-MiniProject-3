@@ -3,36 +3,88 @@ const usernameInput = document.querySelector('#username-input')
 const passwordInput = document.querySelector('#password-input');
 const passwordConfirm = document.querySelector('#password-confirm');
 
-console.log(`DEBUG: \n${signupForm}\n${passwordInput}\n${passwordConfirm}`);
-
 signupForm.addEventListener('submit', (event) => {
+    console.log('submitting');
     event.preventDefault();
     processSignup();
 })
 
-function processSignup() {
-    processSignupInfo();
+async function processSignup() {
+    console.log('processing');
+    const signupInfoIsValid = validateSignupInfo();
+    
+    if (!signupInfoIsValid) {
+        console.error('SIGNUP INFO INVLAID');
+        return false;
+    }
+
+    console.log('POSTING');
+    const signupSuccessful = await postSignup();
+
+    if (!signupSuccessful) {
+        console.error('SIGNUP UNSUCCESSFUL');
+        return false;
+    }
+
+    // signed up 
+    // TODO: redirect to login
+    redirectHome();
 }
 
-function processSignupInfo() {
+function redirectHome() {
+    window.location.href = '/';
+}
+
+async function postSignup() {
+    console.log("sending signup");
+    const formData = new FormData(signupForm);
+    const dataObject = Object.fromEntries(formData);
+    const jsonData = JSON.stringify(dataObject);
+    return fetch('/api/signup', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: jsonData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(response.status, response.statusText);
+        }
+    })
+    .then(_ => {
+        console.log('Signup recieved');
+        return true;
+    })
+    .catch(err => {
+        console.error('Error occured while sending signup, ', err);
+        return false;
+    });
+}
+
+function validateSignupInfo() {
+    console.log('VALIDATING');
     const passwordsDontMatch = passwordInput.value != passwordConfirm.value;
     const invalidPassword = !validatePassword(passwordInput.value);
     const invalidUsername = !validateUsername(usernameInput.value)
 
     if (passwordsDontMatch) {
         passwordConfirm.classList.add('is-invalid');
+        console.log('NO MATCH: ', passwordInput.value, passwordConfirm.value);
     }
     
     if (invalidPassword) {
         passwordInput.classList.add('is-invalid');
+        console.log('INVALID PASS: ', passwordInput.value);
     }
 
     if (invalidUsername) {
         usernameInput.classList.add('is-invalid');
+        console.log('INVALID NAME: ', usernameInput.value);
     }
 
-    return (passwordsDontMatch &&
-        invalidPassword &&
+    return !(passwordsDontMatch ||
+        invalidPassword ||
         invalidUsername);
 }
 
