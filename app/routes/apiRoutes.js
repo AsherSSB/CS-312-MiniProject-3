@@ -15,7 +15,19 @@ router.post('/signup', async (req, res) => {
         return res.status(400).json({message: 'username already registered'});
     }
     
+    console.debug('adding user');
+    const userSuccessfullyAdded = await DB.addUser(
+        payload.userid, payload.username, payload.password)
 
+    if (!userSuccessfullyAdded) {
+        console.debug('db err adding user');
+        return res.status(500).json(
+            {message: 'server error while adding user to database'});
+    }
+
+    console.debug('success user added!');
+
+    return res.status(201).json({message: 'successfully registered user'});
 });
 
 router.post('/blog', async (req, res) => {

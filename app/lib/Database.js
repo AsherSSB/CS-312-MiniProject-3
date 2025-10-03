@@ -124,10 +124,10 @@ async function editBlogBody(blogId, newBody) {
 
 async function checkUsernameExists(username) {
     return await pool.query(`
-            SELECT EXISTS FROM (
+            SELECT EXISTS (
                 SELECT 1
                 FROM users
-                WHERE username = $1
+                WHERE name = $1
             );
         `, [username])
         .then(res => {
@@ -139,7 +139,20 @@ async function checkUsernameExists(username) {
         });
 }
 
-async function addUser(
+async function addUser(userId, name, password) {
+    return await pool.query(`
+            INSERT INTO users (user_id, password, name)
+            VALUES ($1, $2, $3);
+        `, [userId, password, name])
+        .then(_ => {
+            console.debug('successfully added user to database');
+            return true;
+        })
+        .catch(err => {
+            console.error('Error while adding user to database', err);
+            return false;
+        });
+}
 
 module.exports = {
     initializeTables,
@@ -147,5 +160,6 @@ module.exports = {
     postBlog,
     deleteBlog,
     editBlogBody,
-    checkUsernameExists
+    checkUsernameExists,
+    addUser
 }

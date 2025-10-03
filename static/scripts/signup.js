@@ -1,4 +1,5 @@
 const signupForm = document.querySelector('#signup-form');
+const userIdInput = document.querySelector('#userid-input');
 const usernameInput = document.querySelector('#username-input')
 const passwordInput = document.querySelector('#password-input');
 const passwordConfirm = document.querySelector('#password-confirm');
@@ -68,39 +69,49 @@ function validateSignupInfo() {
     console.debug('VALIDATING');
     const passwordsDontMatch = passwordInput.value != passwordConfirm.value;
     const invalidPassword = !validatePassword(passwordInput.value);
+    const invalidUserId = !validateUserId(userIdInput.value);
     const invalidUsername = !validateUsername(usernameInput.value)
 
     if (passwordsDontMatch) {
         passwordConfirm.classList.add('is-invalid');
-        console.debug('NO MATCH: ', passwordInput.value, passwordConfirm.value);
     }
     
     if (invalidPassword) {
         passwordInput.classList.add('is-invalid');
-        console.debug('INVALID PASS: ', passwordInput.value);
     }
 
     if (invalidUsername) {
         usernameInput.classList.add('is-invalid');
-        console.debug('INVALID NAME: ', usernameInput.value);
+    }
+
+    if (invalidUsername) {
+        userIdInput.classList.add('is-invalid');
     }
 
     return !(passwordsDontMatch ||
         invalidPassword ||
-        invalidUsername);
+        invalidUsername ||
+        invalidUserId);
+}
+
+function validateUserId(userId) {
+    return (containsLowerCase(userId) || containsUppercase(userId)) && 
+        withinVarchar255(userId);
 }
 
 function validateUsername(username) {
     return ((containsUppercase(username) ||
         containsLowerCase(username)) && 
-        !containsSpecialCharacter(username));
+        !containsSpecialCharacter(username) &&
+        withinVarchar255(username));
 }
 
 function validatePassword(password) {
     return (containsLowerCase(password) &&
         containsUppercase(password) &&
         containsSpecialCharacter(password) &&
-        containsNumber(password));
+        containsNumber(password) &&
+        withinVarchar255(password));
 }
 
 function containsLowerCase(string) {
@@ -117,4 +128,8 @@ function containsNumber(string) {
 
 function containsSpecialCharacter(string) {
     return /[!@#$%^&*()_+\-=\[\]{}|;:'",.<>\/?]/.test(string);
+}
+
+function withinVarchar255(string) {
+    return string.length <= 255;
 }
