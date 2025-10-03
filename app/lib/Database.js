@@ -154,6 +154,24 @@ async function addUser(userId, name, password) {
         });
 }
 
+async function validateLogin(userId, password) {
+    return await fetch(`
+            SELECT EXISTS (
+                SELECT 1
+                FROM users
+                WHERE userId = $1
+                AND password = $2
+            );
+        `, [userId, password])
+        .then(res => {
+            return res.rows[0].exists;
+        })
+        .catch(err => {
+            console.error('Error while querying login', err);
+            return false;
+        });
+}
+
 module.exports = {
     initializeTables,
     getAllBlogs,
@@ -161,5 +179,6 @@ module.exports = {
     deleteBlog,
     editBlogBody,
     checkUsernameExists,
-    addUser
+    addUser,
+    validateLogin
 }

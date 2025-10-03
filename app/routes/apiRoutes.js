@@ -2,6 +2,17 @@ const express = require('express');
 const router = express.Router();
 const DB = require('../lib/Database');
 
+router.post('/login', async (req, res) => {
+    const payload = req.body;
+    const loginSuccessful = DB.validateLogin(payload.userid, payload.password);
+
+    if (!loginSuccessful) {
+        return res.status(401).json({message: 'Login failed'});
+    }
+
+    return res.status(200).json({message: 'Login successful'});
+});
+
 router.post('/signup', async (req, res) => {
     const payload = req.body;
 
