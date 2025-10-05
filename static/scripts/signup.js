@@ -30,11 +30,11 @@ async function processSignup() {
     // signed up 
     // TODO: redirect to login
     console.debug('goin home');
-    redirectHome();
+    redirectToLogin();
 }
 
-function redirectHome() {
-    window.location.href = '/';
+function redirectToLogin() {
+    window.location.href = '/login';
 }
 
 async function postSignup() {
