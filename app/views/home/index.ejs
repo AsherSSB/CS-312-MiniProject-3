@@ -25,13 +25,13 @@
                 <div class="row card mb-5">
                     <div class="blog-title card-header d-flex justify-content-between">
 						<span><span class="rounded-pill bg-primary px-2 py-1"><%= blog.category %></span> <%= blog.title %></span>
-						<span class="blog-author">Posted By: <%= blog.author %></span>
+						<span class="blog-author">Posted By: <%= blog.username %></span>
 					</div>
                     <div class="card-body my-3">
-                        <div class="blog-content card-text"><%= blog.content %></div>
+                        <div class="blog-content card-text"><%= blog.body %></div>
                     </div>
                     <div class="blog-footer card-footer d-flex justify-content-between">
-                        <span class="blog-time-container">Posted at: <span class=blog-time><%= blog.time %></span></span>
+                        <span class="blog-time-container">Posted at: <span class=blog-time><%= blog.date_created %></span></span>
                         <span class="blog-controls">
                             <button class="blog-delete btn-danger btn-sm">Delete</button>
                             <button class="blog-edit btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#staticEdit">Edit</button>

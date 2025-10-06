@@ -1,4 +1,5 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const path = require('path');
 const app = express();
 
@@ -13,6 +14,7 @@ app.set('views', path.join(__dirname, 'app/views'));
 app.use(express.static(path.join(__dirname, 'static')));
 app.use(express.urlencoded({ extended: true }));  // auto parse form data into object
 app.use(express.json());  // automatically parse json request body into object
+app.use(cookieParser());  // allows access to cookies via req.cookies
 
 // routers
 app.use('/', homeRoutes);

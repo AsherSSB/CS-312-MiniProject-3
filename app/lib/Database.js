@@ -1,6 +1,8 @@
 require('dotenv').config()  // loading postgres credentials
 const { Pool } = require('pg');
 
+console.debug('username:', process.env.PG_USERNAME);
+console.debug('pass:', process.env.PG_PASSWORD);
 const pool = new Pool({
     user: process.env.PG_USERNAME,
     password: process.env.PG_PASSWORD,
@@ -17,7 +19,8 @@ async function initializeTables() {
             name varchar(255) NOT NULL
         );
     `)
-    .then(_ => {
+    .then(res => {
+        console.debug('init: ', res);
         console.log('Successfully initialized users table');
         return true;
     })
@@ -36,10 +39,11 @@ async function initializeTables() {
                 title varchar(255) NOT NULL,
                 category varchar(255),
                 body text,
-                date_created timestamp
+                date_created timestamp DEFAULT CURRENT_TIMESTAMP
             );
         `)
-        .then(_ => {
+        .then(res => {
+            console.debug('init blogs:', res);
             console.log('Successfully initialized blogs table');
             return true;
         })
@@ -56,9 +60,10 @@ async function initializeTables() {
 }
 
 async function getAllBlogs() {
-    const blogs = await pool.query(`
-            SELECT * 
-            FROM blogs; 
+    return await pool.query(`
+            SELECT blogs.*, users.*, users.name AS username
+            FROM blogs
+            JOIN users ON blogs.creator_user_id = users.user_id; 
         `) 
         .then(res => {
             return res.rows;
@@ -67,8 +72,6 @@ async function getAllBlogs() {
             console.error('Error occured while getting blogs', err);
             return [];
         });
-
-    return blogs;
 }
 
 
@@ -102,7 +105,7 @@ async function deleteBlog(blogId) {
 }
 
 async function editBlogBody(blogId, newBody) {
-    const result = await pool.query(`
+    return await pool.query(`
             UPDATE blogs
             SET body = $1
             WHERE blog_id = $2;
@@ -119,7 +122,22 @@ async function editBlogBody(blogId, newBody) {
             return false;
         });
 
-    return result;
+}
+
+async function getBlogAuthorId(blogId) {
+    return await pool.query(`
+            SELECT creator_user_id
+            FROM blogs
+            WHERE blog_id = $1
+            LIMIT 1;
+        `, [blogId])
+        .then(res => {
+            return res.rows[0].creator_user_id;
+        })
+        .catch(err => {
+            console.err('Error while getting blog author: ', err);
+            return "";
+        });
 }
 
 async function checkUsernameExists(username) {
@@ -155,11 +173,11 @@ async function addUser(userId, name, password) {
 }
 
 async function validateLogin(userId, password) {
-    return await fetch(`
+    return await pool.query(`
             SELECT EXISTS (
                 SELECT 1
                 FROM users
-                WHERE userId = $1
+                WHERE user_id = $1
                 AND password = $2
             );
         `, [userId, password])
@@ -180,5 +198,6 @@ module.exports = {
     editBlogBody,
     checkUsernameExists,
     addUser,
-    validateLogin
+    validateLogin,
+    getBlogAuthorId
 }

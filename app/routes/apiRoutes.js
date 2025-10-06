@@ -1,16 +1,35 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
+
 const router = express.Router();
 const DB = require('../lib/Database');
 
+function validateJwt(req) {
+    return jwt.verify(req.cookies.jwt, process.env.JWT_SECRET);
+}
+
 router.post('/login', async (req, res) => {
     const payload = req.body;
-    const loginSuccessful = DB.validateLogin(payload.userid, payload.password);
+    const loginSuccessful = await DB.validateLogin(payload.userid, payload.password);
 
     if (!loginSuccessful) {
         return res.status(401).json({message: 'Login failed'});
     }
 
-    return res.status(200).json({message: 'Login successful'});
+    jwtSecret = process.env.JWT_SECRET;
+    const data = { userId: payload.userid };
+    const token = jwt.sign(data, jwtSecret);
+
+    res.cookie('jwt', token, {
+        httpOnly: true,
+        maxAge: 36000000 // 10hr 
+    });
+
+    res.cookie('userId', payload.userid, {
+        maxAge: 36000000 // 10hr 
+    });
+
+    return res.status(200).json({ message: 'Login successful' });
 });
 
 router.post('/signup', async (req, res) => {
@@ -43,17 +62,19 @@ router.post('/signup', async (req, res) => {
 
 router.post('/blog', async (req, res) => {
     const payload = req.body;
+    console.debug(payload);
+
     if (!payload) {
         return res.status(400).json({message: 'blog posted unsuccessfully'});
 	}
 
-    const author = payload.author
-	const title = payload.title
-	const body = payload.content
-	const category = payload.category
+    const author = payload.author;
+	const title = payload.title;
+	const body = payload.content;
+	const category = payload.category;
+    const userId = req.cookies.userId;
 
-    // TODO: replace 0 with user id when JWT implement
-    const successfullyPosted = DB.postBlog(author, 0, title, category, body)
+    const successfullyPosted = await DB.postBlog(author, userId, title, category, body)
 
     if (!successfullyPosted) {
 	    return res.status(400).json({message: 'bad request posting blog'});
@@ -67,6 +88,16 @@ router.delete('/blog/:id', async (req, res) => {
     if (isNaN(blogId)) {
         return res.status(400).json({message: 'Invalid blog ID'});
 	}
+
+    const blogAuthor = await DB.getBlogAuthorId(blogId);
+
+    if (req.cookies.userId !== blogAuthor) {
+        return res.status(403).json({message: 'Wrong author'});
+    }
+
+    if (!validateJwt(req)) {
+        return res.status(403).json({message: 'expired JWT'});
+    }
 
     const result = await DB.deleteBlog(blogId);
     

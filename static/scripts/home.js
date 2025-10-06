@@ -80,7 +80,7 @@ function addBlog(blogData) {
 
 function deleteBlog(blog) {
     const blogIndex = blogsDivArray.indexOf(blog);
-    const blogId = windowBlogData[blogIndex]['id']; 
+    const blogId = windowBlogData[blogIndex]['blog_id']; 
 
     fetch(serverURL+'/api/blog/'+blogId, {method: 'DELETE'})
     .then(response => {
@@ -97,7 +97,7 @@ function deleteBlog(blog) {
 
 function editBlog(blog) {
     const blogIndex = blogsDivArray.indexOf(blog);
-    const blogId = windowBlogData[blogIndex]['id']; 
+    const blogId = windowBlogData[blogIndex]['blog_id']; 
     editForm.dataset.blogId = blogId;
 }
 

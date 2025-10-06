@@ -29,8 +29,11 @@ async function submitLogin() {
             userIdInput.classList.add('is-invalid');
             throw new Error('unauthorized');
         }
+
+        return response.json()
     })
-    .then(_ => {
+    .then(data => {
+        console.log(data.message);
         return true;
     })
     .catch(err => {
