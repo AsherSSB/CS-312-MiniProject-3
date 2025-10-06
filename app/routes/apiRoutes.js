@@ -120,6 +120,16 @@ router.patch('/blog/:id', async (req, res) => {
 		return res.status(400).json({message: 'Invalid payload'});
 	}
 
+    if(!validateJwt(req)) {
+        return res.status(403).json({message: 'expired JWT'});
+    }
+
+    const blogAuthor = await DB.getBlogAuthorId(blogId);
+
+    if(req.cookies.userId != blogAuthor) {
+        return res.status(403).json({message: 'Wrong author'});
+    }
+
     const result = await DB.editBlogBody(blogId, payload.content);
 
 	if (!result) {
