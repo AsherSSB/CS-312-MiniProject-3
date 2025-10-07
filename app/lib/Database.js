@@ -1,8 +1,6 @@
 require('dotenv').config()  // loading postgres credentials
 const { Pool } = require('pg');
 
-console.debug('username:', process.env.PG_USERNAME);
-console.debug('pass:', process.env.PG_PASSWORD);
 const pool = new Pool({
     user: process.env.PG_USERNAME,
     password: process.env.PG_PASSWORD,
@@ -20,7 +18,6 @@ async function initializeTables() {
         );
     `)
     .then(res => {
-        console.debug('init: ', res);
         console.log('Successfully initialized users table');
         return true;
     })
@@ -43,7 +40,6 @@ async function initializeTables() {
             );
         `)
         .then(res => {
-            console.debug('init blogs:', res);
             console.log('Successfully initialized blogs table');
             return true;
         })

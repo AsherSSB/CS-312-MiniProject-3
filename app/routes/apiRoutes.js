@@ -92,11 +92,11 @@ router.delete('/blog/:id', async (req, res) => {
     const blogAuthor = await DB.getBlogAuthorId(blogId);
 
     if (req.cookies.userId !== blogAuthor) {
-        return res.status(403).json({message: 'Wrong author'});
+        return res.status(403).json({message: 'You are not the author of this post'});
     }
 
     if (!validateJwt(req)) {
-        return res.status(403).json({message: 'expired JWT'});
+        return res.status(403).json({message: 'Your session has expired'});
     }
 
     const result = await DB.deleteBlog(blogId);

@@ -7,18 +7,28 @@ const newBlogButton = document.getElementById('new-blog-button');
 const submissionOverlay = document.getElementById('submission-overlay');
 const editForm = document.getElementById('edit-blog-container');
 const editModal = document.getElementById('staticEdit');
+const warningMessageModalElement = document.getElementById('staticMessageModal');
+const warningMessageModal = new bootstrap.Modal(warningMessageModalElement);
+const warningMessage = document.getElementById('staticMessage')
 
 const serverURL = window.location.origin;
-const windowBlogData = window.blogs;
 
-const blogsDivArray = Array.from(blogContainer.children);
+let currentlyEditingId = -1;
 
-deleteButtons.forEach(element => {
-    element.addEventListener('click', () => deleteBlog(element.closest('.row')));
-});
+// TODO: show modal on error
+// modal.show();
+// modal.hide();
 
 editButtons.forEach(element => {
-	element.addEventListener('click', () => editBlog(element.closest('.row')));
+    element.addEventListener('click', (_) => {
+        currentlyEditingId = element.dataset.blogid;
+    });
+});
+
+deleteButtons.forEach(element => {
+    element.addEventListener('click', (_) => {
+        deleteButtonTriggered(element);
+    });
 });
 
 timeDisplays.forEach(element => {
@@ -47,6 +57,31 @@ editForm.addEventListener('submit', (e) => {
     patchEdit()
 });
 
+function deleteButtonTriggered(deleteButton) {
+    const blogId = deleteButton.dataset.blogid;
+    fetch(serverURL+'/api/blog/'+blogId, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        const data = response.json();
+        if (!response.ok) {
+            warningMessageModal.show();
+            throw new Error(response.status, response.message);
+        }
+
+        return data;
+    })
+    .then(data => {
+        console.log(data);
+    })
+    .catch(err => {
+        console.error(err);
+    });
+}
+
 function displayOverlay(headerText) {
     const overlayHeader = submissionOverlay.querySelector('h1');
     overlayHeader.innerHTML = headerText;
@@ -66,44 +101,27 @@ function addBlog(blogData) {
         })
     })
     .then(response => {
+        const data = response.json();
         if (!response.ok) {
+            warningMessageModal.show();
+
             throw new Error(`HTTP Error: ${response.status}`);
         }
-        return response.json();
+        return data;
     })
-    .then(data => {
+    .then(_ => {
         window.location.reload();
     })
-    .catch(error => console.log('Error: ', error));
-
-}
-
-function deleteBlog(blog) {
-    const blogIndex = blogsDivArray.indexOf(blog);
-    const blogId = windowBlogData[blogIndex]['blog_id']; 
-
-    fetch(serverURL+'/api/blog/'+blogId, {method: 'DELETE'})
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP Error: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        window.location.reload();
-    })
-    .catch(error => console.log('Error: ', error));
-}
-
-function editBlog(blog) {
-    const blogIndex = blogsDivArray.indexOf(blog);
-    const blogId = windowBlogData[blogIndex]['blog_id']; 
-    editForm.dataset.blogId = blogId;
+    .catch(error => {
+        console.error(error);
+    });
 }
 
 function patchEdit() {
     formData = new FormData(editForm);
-    blogId = editForm.dataset.blogId;
+
+    const blogId = currentlyEditingId;
+
     fetch(serverURL+'/api/blog/'+blogId, {
         method: 'PATCH',
         headers: {
