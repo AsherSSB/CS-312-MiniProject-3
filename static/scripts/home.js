@@ -3,21 +3,28 @@ const newBlogForm = document.getElementById('new-blog-container');
 const timeDisplays = document.querySelectorAll('.blog-time');
 const deleteButtons = document.querySelectorAll('.blog-delete');
 const editButtons = document.querySelectorAll('.blog-edit');
+const blogControllers = document.querySelectorAll('.blog-controls');
 const newBlogButton = document.getElementById('new-blog-button');
 const submissionOverlay = document.getElementById('submission-overlay');
 const editForm = document.getElementById('edit-blog-container');
 const editModal = document.getElementById('staticEdit');
-const warningMessageModalElement = document.getElementById('staticMessageModal');
-const warningMessageModal = new bootstrap.Modal(warningMessageModalElement);
-const warningMessage = document.getElementById('staticMessage')
 
 const serverURL = window.location.origin;
+
+const userId = loadUserId();
 
 let currentlyEditingId = -1;
 
 // TODO: show modal on error
 // modal.show();
 // modal.hide();
+
+blogControllers.forEach(element => {
+    const blogAuthorId = element.dataset.blogauthorid;
+    if (blogAuthorId !== userId) {
+        element.classList.add('d-none');
+    }
+});
 
 editButtons.forEach(element => {
     element.addEventListener('click', (_) => {
@@ -57,6 +64,17 @@ editForm.addEventListener('submit', (e) => {
     patchEdit()
 });
 
+function loadUserId() {
+    const data = JSON.parse(localStorage.getItem('userId'));
+    const time = new Date();
+
+    if (data.ttl < time.getTime()) {
+        return -1;
+    }
+
+    return data.userId;
+}
+
 function deleteButtonTriggered(deleteButton) {
     const blogId = deleteButton.dataset.blogid;
     fetch(serverURL+'/api/blog/'+blogId, {
@@ -68,7 +86,6 @@ function deleteButtonTriggered(deleteButton) {
     .then(response => {
         const data = response.json();
         if (!response.ok) {
-            warningMessageModal.show();
             throw new Error(response.status, response.message);
         }
 
@@ -76,6 +93,7 @@ function deleteButtonTriggered(deleteButton) {
     })
     .then(data => {
         console.log(data);
+        window.location.href = '/';
     })
     .catch(err => {
         console.error(err);
@@ -103,8 +121,6 @@ function addBlog(blogData) {
     .then(response => {
         const data = response.json();
         if (!response.ok) {
-            warningMessageModal.show();
-
             throw new Error(`HTTP Error: ${response.status}`);
         }
         return data;

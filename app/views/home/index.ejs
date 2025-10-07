@@ -32,7 +32,7 @@
                     </div>
                     <div class="blog-footer card-footer d-flex justify-content-between">
                         <span class="blog-time-container">Posted at: <span class=blog-time><%= blog.date_created %></span></span>
-                        <span class="blog-controls">
+                        <span class="blog-controls" data-blogAuthorId=<%=blog.creator_user_id%>>
                             <button class="blog-delete btn-danger btn-sm" data-blogId=<%=blog.blog_id%>>Delete</button>
                             <button class="blog-edit btn-secondary btn-sm" data-bs-toggle="modal" data-blogId=<%=blog.blog_id%> data-bs-target="#staticEdit">Edit</button>
                         </span>
@@ -115,20 +115,6 @@
             </div>
         </div>
 
-        <!-- Warning Modal -->
-        <div class="modal fade" id="staticMessageModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="staticMessage">Hello</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
- 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
         <script src="/scripts/home.js"></script>
     </body>

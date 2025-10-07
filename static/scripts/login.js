@@ -34,6 +34,7 @@ async function submitLogin() {
     })
     .then(data => {
         console.log(data.message);
+        setLocalStorageUserId(data.userId, data.ttl);
         return true;
     })
     .catch(err => {
@@ -42,3 +43,14 @@ async function submitLogin() {
     });
 }
 
+function setLocalStorageUserId(userId, timeToLive) {
+    const time = new Date();
+    const expirationTime = time.getTime() + timeToLive;
+
+    const data = {
+        userId: userId,
+        ttl: expirationTime
+    }
+
+    localStorage.setItem('userId', JSON.stringify(data));
+}

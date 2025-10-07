@@ -29,7 +29,11 @@ router.post('/login', async (req, res) => {
         maxAge: 36000000 // 10hr 
     });
 
-    return res.status(200).json({ message: 'Login successful' });
+    return res.status(200).json({ 
+        message: 'Login successful',
+        userId: payload.userid,
+        ttl: 36000000
+    });
 });
 
 router.post('/signup', async (req, res) => {
