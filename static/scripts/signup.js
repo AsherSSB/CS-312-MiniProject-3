@@ -27,9 +27,6 @@ async function processSignup() {
         return false;
     }
 
-    // signed up 
-    // TODO: redirect to login
-    console.debug('goin home');
     redirectToLogin();
 }
 

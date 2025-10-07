@@ -159,7 +159,6 @@ async function addUser(userId, name, password) {
             VALUES ($1, $2, $3);
         `, [userId, password, name])
         .then(_ => {
-            console.debug('successfully added user to database');
             return true;
         })
         .catch(err => {
